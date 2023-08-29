@@ -1,81 +1,52 @@
-import {ApiHandler} from "sst/node/api";
-import {APIGatewayProxyHandlerV2} from "aws-lambda";
-import {DynamoDB} from "aws-sdk";
-// import * as uuid from "uuid";
-import {Task} from "@ToDo-app/core/task";
-import crypto from "crypto";
+import { ApiHandler } from "sst/node/api";
+import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from "aws-lambda";
+import { DynamoDB } from "aws-sdk";
+import { createTask } from "@ToDo-app/core/src/tasks/createTask";
+import { getTask } from "@ToDo-app/core/src/tasks/getTask";
+import { listTask } from "@ToDo-app/core/src/tasks/listTask";
+// import { updateTask } from "@ToDo-app/core/src/tasks/updateTask";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 export const create = ApiHandler(async (event) => {
-//   return {
-//     statusCode: 400, // Bad Request
-//     body: JSON.stringify(
-//         event.body
-//     )
-// };;
     if (!event.body) {
         return {
             statusCode: 400, // Bad Request
-            body: JSON.stringify(
-                {message: "Path parameters are missing in the request"}
-            )
+            body: JSON.stringify({
+                message: "Path parameters are missing in the request",
+            }),
         };
     }
-    const taskData = JSON.parse(event.body);
-    // return{ taskData };
-    const params = {
-        TableName: process.env.TABLE_NAME as string,
-        Item: {
-            taskId: taskData.id,
-            author: taskData.author,
-            title: taskData.title,
-            content: taskData.content,
-            date: Date.now(),
-            createdAt: Date.now()
-        }
-    };
-    await dynamoDb.put(params).promise();
+    const eventObject: APIGatewayProxyEventV2 = event;
+    const createResponse = await createTask.create(eventObject);
 
     return {
-        statusCode: 200,
-        body: JSON.stringify(params.Item)
+        statusCode: createResponse.statusCode,
+        body: createResponse.body,
     };
 });
 
 export const get = ApiHandler(async (event) => {
-  if (!event.pathParameters) {
-    return {
-        statusCode: 400, // Bad Request
-        body: JSON.stringify(
-            {message: "Path parameters are missing in the request"}
-        )
-    };
-}
-// const taskData = event.pathParameters;
-
-    const params = {
-        TableName: process.env.TABLE_NAME as string,
-        Key: {
-            taskId: event.pathParameters.id
-        }
-    };
-    const results = await dynamoDb.get(params).promise();
+    if (!event.pathParameters) {
+        return {
+            statusCode: 400, // Bad Request
+            body: JSON.stringify({
+                message: "Path parameters are missing in the request",
+            }),
+        };
+    }
+    const eventObject: APIGatewayProxyEventV2 = event;
+    const creatceResponse = await getTask.get(eventObject);
 
     return {
-        statusCode: 200,
-        body: JSON.stringify(results.Item)
+        statusCode: creatceResponse.statusCode,
+        body: creatceResponse.body,
     };
 });
 
 export const list = ApiHandler(async (_evt) => {
-    const params = {
-        TableName: process.env.TABLE_NAME as string,
-        KeyConditionExpression: "taskId = :taskId"
-    };
-    const results = await dynamoDb.scan(params).promise();
-
+    const creatceResponse = await listTask.list();
     return {
-        statusCode: 200,
-        body: JSON.stringify(results.Items)
+        statusCode: creatceResponse.statusCode,
+        body: JSON.stringify(creatceResponse.body),
     };
 });

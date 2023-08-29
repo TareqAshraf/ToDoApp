@@ -1,39 +1,41 @@
 export * as Task from "./task";
 import { z } from "zod";
 import crypto from "crypto";
-
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { event } from "./event";
 import { DynamoDB } from "aws-sdk";
 const dynamoDb = new DynamoDB.DocumentClient();
 
-export const Events = {
-  Created: event("task.created", {
-          taskId: z.string(),
-  }),
-};
+// export const Events = {
+//   Created: event("task.created", {
+//     taskId: z.string(),
+//   }),
+// };
 
-export async function create() {
-    
-  const params = {
-        TableName: process.env.TABLE_NAME as string ,
-        Item: {
-          taskId: crypto.randomUUID(),
-          author: 'tareq1',
-          title: 'tareq1',
-          content: 'tareq1',
-        date:'tareq1',
-          createdAt: Date.now(),
-        },
-      };
-      await dynamoDb.put(params).promise();
+export async function create(event: APIGatewayProxyEventV2) {
+  const { body } = event;
+    const taskData = JSON.parse(body || "");
+    const params = {
+      TableName: process.env.TABLE_NAME as string,
+      Item: {
+        taskId: taskData.id,
+        author: taskData.author,
+        title: taskData.title,
+        content: taskData.content,
+        date: Date.now(),
+        createdAt: Date.now(),
+      },
+    };
+    ``;
+    // await Events.Created.publish({
+    //   taskData.id,
+    // });
+    await dynamoDb.put(params).promise();
 
-  // await Events.Created.publish({
-  //   id,
-  // });
-    return {
-        statusCode: 200,
-        body: JSON.stringify(params.Item),
-      };
+  return {
+    statusCode: 200,
+    body: JSON.stringify(params.Item),
+  };
 }
 
 export function list() {
