@@ -29,8 +29,9 @@
     "aws-amplify": "^5.3.10",
     "aws-dynamodb": "^0.1.69",
     "aws-lambda": "^1.0.7",
-    "aws-sdk": "^2.1445.0",
+    "aws-sdk": "^2.1446.0",
     "react-query": "^3.39.3",
-    "trpc": "^0.11.3"
+    "trpc": "^0.11.3",
+    "uuid": "^9.0.0"
   }
 }

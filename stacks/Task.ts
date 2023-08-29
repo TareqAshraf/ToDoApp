@@ -1,41 +1,42 @@
 import { Api, StaticSite, StackContext, Table, EventBus } from "sst/constructs";
 
-export function Blog({ stack }: StackContext) {
-  const bus = new EventBus(stack, "bus", {
+export function Task({ stack }: StackContext) {
+  const bus = new EventBus(stack, "taskbus", {
     defaults: {
       retries: 10,
     },
   });
   // Create the table
-  const blogTable = new Table(stack, "Blog", {
+  const taskTable = new Table(stack, "Task", {
     fields: {
-      blogId: "string",
+      taskId: "string",
       author: "string",
       title: "string",
       content: "string",
+      date:'string',
       createdAt: "string",
     },
-    primaryIndex: { partitionKey: "blogId" },
+    primaryIndex: { partitionKey: "taskId" },
   });
 
-  const blogApi = new Api(stack, "BlogApi", {
+  const taskApi = new Api(stack, "TaskApi", {
     defaults: {
       function: {
         bind: [bus],
         environment: {
-          TABLE_NAME: blogTable.tableName,
+          TABLE_NAME: taskTable.tableName,
         },
       },
     },
     routes: {
-      "GET /blog": "packages/functions/src/blog.list",
-      "POST /blog": "packages/functions/src/blog.create",
-      // "GET /blogs/{id}": "functions/get-blogs.handler",
-      // "PUT /blogs/{id}": "functions/update-blogs.handler",
-      // "DELETE /blogs/{id}": "functions/delete-blogs.handler",
+      "GET /task": "packages/functions/src/task.list",
+      "POST /task": "packages/functions/src/task.create",
+      "GET /task/{id}": "packages/functions/src/task.get",
+      // "PUT /task/{id}": "functions/src/task/ogs.handler",
+      // "DELETE /task/{id}": "functions/src/task/ogs.handler",
     },
   });
-  blogApi.attachPermissions([blogTable]);
+  taskApi.attachPermissions([taskTable]);
 
   // Deploy our React app
   const site = new StaticSite(stack, "ReactSite", {
@@ -43,7 +44,7 @@ export function Blog({ stack }: StackContext) {
     buildCommand: "npm run build",
     buildOutput: "build",
     environment: {
-      REACT_APP_API_URL: blogApi.url,
+      REACT_APP_API_URL: taskApi.url,
     },
     customDomain: "www.my-react-app.com",
   });
@@ -51,6 +52,6 @@ export function Blog({ stack }: StackContext) {
   // Show the URLs in the output
   stack.addOutputs({
     SiteUrl: site.url,
-    ApiEndpoint: blogApi.url,
+    ApiEndpoint: taskApi.url,
   });
 }
