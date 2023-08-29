@@ -1,4 +1,5 @@
 import { Api, StaticSite, StackContext, Table, EventBus } from "sst/constructs";
+import { z } from "zod";
 
 export function Task({ stack }: StackContext) {
   const bus = new EventBus(stack, "taskbus", {
