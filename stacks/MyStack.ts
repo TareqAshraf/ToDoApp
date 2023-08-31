@@ -1,5 +1,5 @@
 import { StackContext, Api, EventBus } from "sst/constructs";
-import {Task } from "./Task";
+import {TaskStack } from "./TaskStack";
 
 
 export function API({ stack }: StackContext) {
@@ -17,6 +17,7 @@ export function API({ stack }: StackContext) {
     },
     routes: {
       "GET /": "packages/functions/src/lambda.handler",
+      // "GET/trpc":"packages/functions/src/trpc.handler",
       "GET /todo": "packages/functions/src/todo.list",
       "POST /todo": "packages/functions/src/todo.create",
     },

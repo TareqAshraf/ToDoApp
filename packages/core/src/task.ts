@@ -1,48 +1,28 @@
-export * as Task from "./task";
-import { z } from "zod";
-import crypto from "crypto";
-import { APIGatewayProxyEventV2 } from "aws-lambda";
-import { event } from "./event";
-import { DynamoDB } from "aws-sdk";
-const dynamoDb = new DynamoDB.DocumentClient();
+import { initTRPC } from '@trpc/server';
+import * as trpc from '@trpc/server';
+import { z } from 'zod';
+import { CreateAWSLambdaContextOptions, awsLambdaRequestHandler } from '@trpc/server/adapters/aws-lambda';
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
 
-// export const Events = {
-//   Created: event("task.created", {
-//     taskId: z.string(),
-//   }),
-// };
+export const t = initTRPC.create();
 
-export async function create(event: APIGatewayProxyEventV2) {
-  const { body } = event;
-    const taskData = JSON.parse(body || "");
-    const params = {
-      TableName: process.env.TABLE_NAME as string,
-      Item: {
-        taskId: taskData.id,
-        author: taskData.author,
-        title: taskData.title,
-        content: taskData.content,
-        date: Date.now(),
-        createdAt: Date.now(),
-      },
-    };
-    ``;
-    // await Events.Created.publish({
-    //   taskData.id,
-    // });
-    await dynamoDb.put(params).promise();
+const appRouter = t.router({
+  getUser: t.procedure.input(z.string()).query((opts) => {
+    opts.input; // string
+    return { id: opts.input, name: 'Bilbo' };
+  }),
+});
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(params.Item),
-  };
-}
+// created for each request
+const createContext = ({
+  event,
+  context,
+}: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>) => ({}) // no context
+type Context = trpc.inferAsyncReturnType<typeof createContext>;
 
-export function list() {
-  return Array(50)
-    .fill(0)
-    .map((_, index) => ({
-      id: crypto.randomUUID(),
-      title: "Todo #" + index,
-    }));
-}
+export const handler = awsLambdaRequestHandler({
+  router: appRouter,
+  createContext,
+})
+// export type definition of API
+export type AppRouter = typeof appRouter;

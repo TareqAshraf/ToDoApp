@@ -1,7 +1,7 @@
 import { Api, StaticSite, StackContext, Table, EventBus } from "sst/constructs";
 import { z } from "zod";
 
-export function Task({ stack }: StackContext) {
+export function TaskStack({ stack }: StackContext) {
   const bus = new EventBus(stack, "taskbus", {
     defaults: {
       retries: 10,
@@ -31,6 +31,7 @@ export function Task({ stack }: StackContext) {
     },
     routes: {
       "GET /task": "packages/functions/src/task.list",
+      "GET /getUser": "packages/functions/src/create.create",
       "POST /task": "packages/functions/src/task.create",
       "GET /task/{id}": "packages/functions/src/task.get",
       "PUT /task/{id}": "functions/src/task/task.update",

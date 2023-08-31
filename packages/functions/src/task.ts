@@ -6,6 +6,7 @@ import { getTask } from "@ToDo-app/core/src/tasks/getTask";
 import { updateTask } from "@ToDo-app/core/src/tasks/updateTask";
 import { listTask } from "@ToDo-app/core/src/tasks/listTask";
 import { deleteTask } from "@ToDo-app/core/src/tasks/deleteTask";
+import * as wams from "@ToDo-app/core/src/task";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 export const create = ApiHandler(async (event) => {
@@ -86,5 +87,23 @@ export const remove = ApiHandler(async (event) => {
     return {
         statusCode: creatceResponse.statusCode,
         body: creatceResponse.body,
+    };
+});
+
+export const getuser = ApiHandler(async (event) => {
+    if (!event.pathParameters) {
+        return {
+            statusCode: 400, // Bad Request
+            body: JSON.stringify({
+                message: "Path parameters are missing in the request",
+            }),
+        };
+    }
+    const eventObject: APIGatewayProxyEventV2 = event;
+    const creatceResponse = await wams.handler;
+
+    return {
+        // statusCode: creatceResponse.statusCode,
+        body: creatceResponse,
     };
 });
