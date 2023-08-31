@@ -3,8 +3,9 @@ import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
 import { createTask } from "@ToDo-app/core/src/tasks/createTask";
 import { getTask } from "@ToDo-app/core/src/tasks/getTask";
+import { updateTask } from "@ToDo-app/core/src/tasks/updateTask";
 import { listTask } from "@ToDo-app/core/src/tasks/listTask";
-// import { updateTask } from "@ToDo-app/core/src/tasks/updateTask";
+import { deleteTask } from "@ToDo-app/core/src/tasks/deleteTask";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 export const create = ApiHandler(async (event) => {
@@ -48,5 +49,42 @@ export const list = ApiHandler(async (_evt) => {
     return {
         statusCode: creatceResponse.statusCode,
         body: JSON.stringify(creatceResponse.body),
+    };
+});
+
+
+export const update = ApiHandler(async (event) => {
+    if (!event.pathParameters) {
+        return {
+            statusCode: 400, // Bad Request
+            body: JSON.stringify({
+                message: "Path parameters are missing in the request",
+            }),
+        };
+    }
+    const eventObject: APIGatewayProxyEventV2 = event;
+    const creatceResponse = await updateTask.update(eventObject);
+
+    return {
+        statusCode: creatceResponse.statusCode,
+        body: creatceResponse.body,
+    };
+});
+
+export const remove = ApiHandler(async (event) => {
+    if (!event.pathParameters) {
+        return {
+            statusCode: 400, // Bad Request
+            body: JSON.stringify({
+                message: "Path parameters are missing in the request",
+            }),
+        };
+    }
+    const eventObject: APIGatewayProxyEventV2 = event;
+    const creatceResponse = await deleteTask.remove(eventObject);
+
+    return {
+        statusCode: creatceResponse.statusCode,
+        body: creatceResponse.body,
     };
 });

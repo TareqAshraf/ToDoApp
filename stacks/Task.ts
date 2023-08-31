@@ -33,8 +33,8 @@ export function Task({ stack }: StackContext) {
       "GET /task": "packages/functions/src/task.list",
       "POST /task": "packages/functions/src/task.create",
       "GET /task/{id}": "packages/functions/src/task.get",
-      // "PUT /task/{id}": "functions/src/task/ogs.handler",
-      // "DELETE /task/{id}": "functions/src/task/ogs.handler",
+      "PUT /task/{id}": "functions/src/task/task.update",
+      "DELETE /task/{id}": "functions/src/task/task.remove",
     },
   });
   taskApi.attachPermissions([taskTable]);
