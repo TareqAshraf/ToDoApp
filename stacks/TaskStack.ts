@@ -33,11 +33,11 @@ export function TaskStack({ stack }: StackContext) {
       "GET /getUser": "packages/functions/src/create.create",
       "POST /task": "packages/functions/src/task.create",
       "GET /task/{id}": "packages/functions/src/task.get",
-      "PUT /task/{id}": "functions/src/task/task.update",
-      "DELETE /task/{id}": "functions/src/task/task.remove",
+      "PUT /task/{id}": "packages/functions/src/task.update",
+      "DELETE /task/{id}": "packages/functions/src/task.remove",
     },
   });
-  taskApi.attachPermissions([taskTable]);
+  taskApi.attachPermissions([taskTable]); 
 
   stack.addOutputs({
     ApiEndpoint: taskApi.url,
