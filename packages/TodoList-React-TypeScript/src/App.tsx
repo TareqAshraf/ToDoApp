@@ -5,8 +5,6 @@ import { ITask } from "./Interfaces";
 
 const App: FC = () => {
   const [task, setTask] = useState<string>("");
-  const [Tauthor, Ttitle] = useState<string>("");
-  const [Tcontent, Tdate] = useState<string>("");
   const [deadline, setDealine] = useState<number>(0);
   const [todoList, setTodoList] = useState<ITask[]>([]);
 
@@ -19,7 +17,7 @@ const App: FC = () => {
   };
 
   const addTask = (): void => {
-    const newTask = { author: Tauthor, title: Ttitle, content: Tcontent, date: Tdate };
+    const newTask = { taskName: task, deadline: deadline };
     setTodoList([...todoList, newTask]);
     setTask("");
     setDealine(0);
@@ -28,7 +26,7 @@ const App: FC = () => {
   const completeTask = (taskNameToDelete: string): void => {
     setTodoList(
       todoList.filter((task) => {
-        return task.content !== taskNameToDelete;
+        return task.taskName !== taskNameToDelete;
       })
     );
   };
@@ -55,9 +53,9 @@ const App: FC = () => {
         <button onClick={addTask}>Add Task</button>
       </div>
       <div className="todoList">
-        {/* {todoList.map((task: ITask, key: number) => {
+        {todoList.map((task: ITask, key: number) => {
           return <TodoTask key={key} task={task} completeTask={completeTask} />;
-        })} */}
+        })}
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import { Api, StaticSite, StackContext, Table, EventBus } from "sst/constructs";
-import { z } from "zod";
 
 export function TaskStack({ stack }: StackContext) {
   const bus = new EventBus(stack, "taskbus", {
@@ -14,7 +13,7 @@ export function TaskStack({ stack }: StackContext) {
       author: "string",
       title: "string",
       content: "string",
-      date:'string',
+      date: 'string',
       createdAt: "string",
     },
     primaryIndex: { partitionKey: "taskId" },
@@ -40,20 +39,11 @@ export function TaskStack({ stack }: StackContext) {
   });
   taskApi.attachPermissions([taskTable]);
 
-  // Deploy our React app
-  const site = new StaticSite(stack, "ReactSite", {
-    path: "packages/frontend",
-    buildCommand: "npm run build",
-    buildOutput: "build",
-    environment: {
-      REACT_APP_API_URL: taskApi.url,
-    },
-    customDomain: "www.my-react-app.com",
-  });
-
-  // Show the URLs in the output
   stack.addOutputs({
-    SiteUrl: site.url,
     ApiEndpoint: taskApi.url,
   });
+
+    return {
+      taskApi,
+    };
 }
