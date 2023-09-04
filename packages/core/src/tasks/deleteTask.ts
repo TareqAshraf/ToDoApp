@@ -6,7 +6,7 @@ import { DynamoDB } from "aws-sdk";
 const dynamoDb = new DynamoDB.DocumentClient();
 
 const taskSchema = z.object({
-    id: z.string(),
+  taskId: z.string(),
 });
 
 export async function remove(event: APIGatewayProxyEventV2) {
@@ -15,10 +15,10 @@ export async function remove(event: APIGatewayProxyEventV2) {
         const taskData = JSON.parse(body || "");
         const validatedData = taskSchema.parse(taskData);
         const params = {
-            TableName: process.env.TABLE_NAME as string,
-            Key: {
-                taskId: validatedData.id,
-            },
+          TableName: process.env.TABLE_NAME as string,
+          Key: {
+            taskId: validatedData.taskId,
+          },
         };
         const results = await dynamoDb.delete(params).promise();
 

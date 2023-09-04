@@ -1,10 +1,13 @@
 import React from "react";
 import { ITask } from "../Interfaces";
+import { fetchTasks } from "./ListTask";
+
 
 interface Props {
   task: ITask;
  onDeleteTask(taskIdToDelete: string): void;
 }
+
 
 const TodoTask = ({ task, onDeleteTask }: Props) => {
   const handleDeleteClick = async () => {
@@ -13,17 +16,18 @@ const TodoTask = ({ task, onDeleteTask }: Props) => {
       // Make a DELETE request to the API
       const response = await fetch(`${process.env.REACT_APP_API_URL}/task/${task.taskId}`, {
         method: "DELETE",
-        headers: {
-        "Content-Type": "application/json", // Specify JSON content type
-      },
-      body: JSON.stringify({
-      taskId: task.taskId,
-    }), 
+      headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ taskId: task.taskId }),
       });
+
+
         console.log(response);
       if (response.ok) {
         // Call the onDeleteTask callback to update the state in the parent component
         onDeleteTask(task.taskId);
+        await fetchTasks();
       } else {
         // Handle the error if the delete request fails
         console.error("Failed to delete task");

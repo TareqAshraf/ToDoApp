@@ -6,10 +6,11 @@ import { DynamoDB } from "aws-sdk";
 const dynamoDb = new DynamoDB.DocumentClient();
 
 const taskSchema = z.object({
-    id: z.string(),
+    taskId: z.string(),
     author: z.string(),
     title: z.string(),
     content: z.string(),
+    date: z.string(),
 });
 
 export async function create(event: APIGatewayProxyEventV2) {
@@ -17,14 +18,33 @@ export async function create(event: APIGatewayProxyEventV2) {
     try {
         const taskData = JSON.parse(body || "");
         const validatedData = taskSchema.parse(taskData);
+
+        const existingTask = await dynamoDb
+            .get({
+                TableName: process.env.TABLE_NAME as string,
+                Key: {
+                    taskId: validatedData.taskId,
+                },
+            })
+            .promise();
+
+        if (existingTask.Item) {
+            // Task with the same taskId already exists, return an error
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    error: "Task with the same taskId already exists",
+                }),
+            };
+        }
         const params = {
             TableName: process.env.TABLE_NAME as string,
             Item: {
-                taskId: validatedData.id,
+                taskId: validatedData.taskId,
                 author: validatedData.author,
                 title: validatedData.title,
                 content: validatedData.content,
-                date: Date.now(),
+                date: validatedData.date,
                 createdAt: Date.now(),
             },
         };

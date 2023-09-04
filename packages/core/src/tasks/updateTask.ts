@@ -6,9 +6,9 @@ import { DynamoDB } from "aws-sdk";
 const dynamoDb = new DynamoDB.DocumentClient();
 
 const taskSchema = z.object({
-    id: z.string(),
-    title: z.string(),
-    content: z.string(),
+  taskId: z.string(),
+  title: z.string(),
+  content: z.string(),
 });
 
 export async function update(event: APIGatewayProxyEventV2) {
@@ -17,15 +17,15 @@ export async function update(event: APIGatewayProxyEventV2) {
         const taskData = JSON.parse(body || "");
         const validatedData = taskSchema.parse(taskData);
         const params = {
-            TableName: process.env.TABLE_NAME as string,
-            Key: {
-                taskId: validatedData.id,
-            },
-            UpdateExpression: "SET content = :content, title = :title",
-            ExpressionAttributeValues: {
-                ":title": validatedData.title,
-                ":content": validatedData.content,
-            },
+          TableName: process.env.TABLE_NAME as string,
+          Key: {
+            taskId: validatedData.taskId,
+          },
+          UpdateExpression: "SET content = :content, title = :title",
+          ExpressionAttributeValues: {
+            ":title": validatedData.title,
+            ":content": validatedData.content,
+          },
         };
         const results = await dynamoDb.update(params).promise();
 

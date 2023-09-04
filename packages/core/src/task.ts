@@ -9,7 +9,7 @@ export const t = initTRPC.create();
 const appRouter = t.router({
   getUser: t.procedure.input(z.string()).query((opts) => {
     opts.input; // string
-    return { id: opts.input, name: 'Bilbo' };
+    return { taskId: opts.input, name: 'Bilbo' };
   }),
 });
 
